@@ -30,8 +30,11 @@ description: "每日抖音养生茶/药食同源热卖情报日报生成器。In
 ## 2. 执行流程（每步含数据质量规则）
 
 **Step 1 拉榜（多源）**
-- 主源：灰豚商品热销榜（按核心词）
-- 副源：蝉妈妈同款查询 + WebSearch 当日新闻
+- 主源：灰豚商品热销榜（按核心词）→ 双链路：
+  - 链路①（类目榜）：`product_category_search`(keyword=核心词) → 取类目 ID → `product_top_selling_product_rank_period`(sort=sales, periodType=day, rdate=当日, cat0=类目ID, from=1)
+  - 链路②（关键词直搜）：`product_library_custom_search_product`(keyword=核心词, sortField=sales30, searchType=2, from=1)
+  - 两链路结果按商品去重合并；链路①取榜单前 20，链路②取月销前 20
+- 副源：蝉妈妈同款查询（execute_cmm_api 商品查询）+ WebSearch 当日新闻
 - 数据质量规则：每个商品记录「销量区间」而非精确值；两源数值偏差 >20% 时取低值并标注"±"
 
 **Step 2 去重与异常值过滤**
@@ -111,6 +114,7 @@ description: "每日抖音养生茶/药食同源热卖情报日报生成器。In
 
 ## 7. 版本记录
 
+- v1.5（2026-09-11）：Step 1 拉榜回写灰豚具体 API（双链路：类目榜 `product_category_search`→`product_top_selling_product_rank_period`；关键词直搜 `product_library_custom_search_product`），并明确合并去重规则
 - v1.4（2026-09-10）：Step 4 升级为平台机制情报通道（前瞻信号落盘、信号处置分级、季度规则大扫除）；新增 Step 7 命中率回测定义（谁/何时/怎么算）
 - v1.3（2026-09-10）：Step 5 改为候选清单输出契约（ABCD 动作级定义），对接 S2/S4
 - v1.2（2026-09-10）：新增流量形态观察（AI工坊/兴趣卡等平台新信号，前瞻不混入决策）；新爆款补充「可模仿性」标注（参考知乎社区打法拆解）
