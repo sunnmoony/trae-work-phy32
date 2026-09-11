@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "chanmama": {
+      "type": "http",
+      "url": "https://ai-api.chanmama.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${CHANMAMA_ACCESS_TOKEN}"
+      }
+    }
+  }
+}
